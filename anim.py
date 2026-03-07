@@ -27,7 +27,7 @@ sprite_sheet = SpriteSheet(sprite_sheet_image)
 
 #create animation list
 animation_list = []
-animation_steps = [4, 6, 3, 4, 7] #animations places in sheet such as running, jumping etc.
+animation_steps = [4, 6, 4, 6, 3, 4] #animations places in sheet such as running, jumping etc.
 action = 0 #what is player doing (stayin, jumping, etc.)
 last_update = pygame.time.get_ticks()
 animation_cooldown = 100
@@ -55,7 +55,7 @@ while running:
         frame += 1
         last_update = current_time
 
-        if frame == animation_steps[action]:
+        if frame >= animation_steps[action]:
             frame = 0
 
     screen.blit(animation_list[action][frame], player_pos)
@@ -65,27 +65,39 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_DOWN and action >0:
-                action -=1
-                frame = 0
-            if event.key == pygame.K_UP and action < len(animation_list)-1:
-                action +=1
-                frame = 0
-    
+        #if event.type == pygame.KEYDOWN:
+        #    if event.key == pygame.K_DOWN and action >0:
+        #        action -=1
+        #        frame = 0
+        #    if event.key == pygame.K_UP and action < len(animation_list)-1:
+        #        action +=1
+        #        frame = 0
+    moving = False
+
     keys = pygame.key.get_pressed()
     if keys[pygame.K_w]:
         player_pos.y -= speed * dt
-        action = 1
+        moving = True
     if keys[pygame.K_s]:
         player_pos.y += speed * dt
-        action = 1
+        moving = True
     if keys[pygame.K_a]:
         player_pos.x -= speed *dt
         action = 1
+        moving = True
     if keys[pygame.K_d]:
         player_pos.x += speed * dt
-        action = 1
+        action = 3
+        moving = True
+
+    if moving == False :
+        if action == 1:
+            action = 0
+        if action == 3:
+            action = 2
+        if frame >= animation_steps[action]:
+            frame = 0
+    
 
     dt = clock.tick(60) / 1000
             
