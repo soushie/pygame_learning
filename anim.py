@@ -20,6 +20,10 @@ dt=0
 #sets screen
 screen= pygame.display.set_mode((Screen_Width , Screen_Height))
 pygame.display.set_caption("dinosawr")
+# load background
+background = pygame.image.load("assets/images/background.png").convert()
+background = pygame.transform.scale(background, (Screen_Width, Screen_Height))
+
 
 #gets sprites for character and animation
 sprite_sheet_image = pygame.image.load("assets/images/doux.png").convert_alpha()
@@ -31,7 +35,9 @@ door_anim = [door_sheet.get_image(0, 24, 24, 4, Black) ,door_sheet.get_image(1, 
 door_state = 0
 f = 1
 
-#create animation list
+#create animation# load background
+background = pygame.image.load("assets/images/background.png").convert()
+background = pygame.transform.scale(background, (Screen_Width, Screen_Height))
 animation_list = []
 animation_steps = [4, 6, 4, 6] #animations places in sheet such as running, jumping etc.
 action = 0 #what is player doing (stayin, jumping, etc.)
@@ -67,7 +73,7 @@ while running:
 
     dt = clock.tick(60)/1000
 
-    screen.fill(BG)
+    screen.blit(background, (0,0))
     pygame.draw.rect(screen, (255,0,0), door_rect, 2)
 
     for event in pygame.event.get():
