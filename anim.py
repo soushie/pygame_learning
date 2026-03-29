@@ -13,7 +13,7 @@ BG = (50, 50, 50)
 Black = (0, 0, 0)
 
 player_pos =  pygame.Vector2(200,200)
-speed = 100
+speed = 150
 clock= pygame.time.Clock()
 dt=0
 
@@ -28,12 +28,11 @@ background = pygame.transform.scale(background, (Screen_Width, Screen_Height))
 #gets sprites for character and animation
 sprite_sheet_image = pygame.image.load("assets/images/doux.png").convert_alpha()
 sprite_sheet = SpriteSheet(sprite_sheet_image)
-eyvaz_mask = pygame.mask.from_surface(sprite_sheet_image)
-mask_image = eyvaz_mask.to_surface()
 
 #door animation
 door_sheet = SpriteSheet(pygame.image.load("assets/images/door.png").convert_alpha())
 door_anim = [door_sheet.get_image(0, 24, 24, 4, Black) ,door_sheet.get_image(1, 24, 24, 4, Black) ]
+
 door_state = 0
 f = 1
 
@@ -92,7 +91,6 @@ while running:
     dt = clock.tick(60)/1000
 
     screen.blit(background, (0,0))
-    pygame.draw.rect(screen, (255,0,0), door_rect, 2)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -137,50 +135,66 @@ while running:
             set_action(2)
         if frame >= animation_steps[action]:
             frame = 0
-    
-    # ---------- MOVE X ----------
-    player_pos.x += dx
-    player_rect.topleft = (int(player_pos.x), int(player_pos.y))
 
+    # PLAYER + DOOR MASKS
+    player_image = animation_list[action][frame]
+    player_mask = pygame.mask.from_surface(player_image)
+
+    door_image = door_anim[door_state]
+    door_mask = pygame.mask.from_surface(door_image)
+
+    # MOVE X (predictive)
+    future_rect = player_rect.copy()
+    future_rect.x += int(dx)
+
+    blocked = False
+
+    # wall collision
     for wall in walls:
-        if player_rect.colliderect(wall):
-            if dx > 0:  # moving right
-                player_rect.right = wall.left
-            if dx < 0:  # moving left
-                player_rect.left = wall.right
-            player_pos.x = player_rect.x
+        if future_rect.colliderect(wall):
+            blocked = True
+            break
 
-    # door collision (X)
-    if player_rect.colliderect(door_rect):
-        if dx > 0:
-            player_rect.right = door_rect.left
-        if dx < 0:
-            player_rect.left = door_rect.right
-        player_pos.x = player_rect.x
+    # door mask collision
+    if not blocked:
+        offset = (
+            door_rect.x - future_rect.x,
+            door_rect.y - future_rect.y
+        )
+        if player_mask.overlap(door_mask, offset):
+            blocked = True
 
+    # apply movement only if free
+    if not blocked:
+        player_rect.x = future_rect.x
 
-    # ---------- MOVE Y ----------
-    player_pos.y += dy
-    player_rect.topleft = (int(player_pos.x), int(player_pos.y))
+    # MOVE Y (predictive)
+    future_rect = player_rect.copy()
+    future_rect.y += int(dy)
 
+    blocked = False
+
+    # wall collision
     for wall in walls:
-        if player_rect.colliderect(wall):
-            if dy > 0:  # moving down
-                player_rect.bottom = wall.top
-            if dy < 0:  # moving up
-                player_rect.top = wall.bottom
-            player_pos.y = player_rect.y
+        if future_rect.colliderect(wall):
+            blocked = True
+            break
 
-    # door collision (Y)
-    if player_rect.colliderect(door_rect):
-        if dy > 0:
-            player_rect.bottom = door_rect.top
-        if dy < 0:
-            player_rect.top = door_rect.bottom
-        player_pos.y = player_rect.y
+    # door mask collision
+    if not blocked:
+        offset = (
+            door_rect.x - future_rect.x,
+            door_rect.y - future_rect.y
+        )
+        if player_mask.overlap(door_mask, offset):
+            blocked = True
 
-    #update rect position
-    player_rect.topleft = (int(player_pos.x), int(player_pos.y))
+    # apply movement only if free
+    if not blocked:
+        player_rect.y = future_rect.y
+
+    # FINAL SYNC
+    player_pos.xy = player_rect.topleft
 
     #update animation
     current_time = pygame.time.get_ticks()
@@ -191,8 +205,8 @@ while running:
         if frame >= animation_steps[action]:
             frame = 0
 
-    screen.blit(door_anim[door_state], (Screen_Width/2,Screen_Height/2))
-    screen.blit(animation_list[action][frame], player_pos)
+    screen.blit(door_image, door_rect.topleft)
+    screen.blit(player_image, player_rect.topleft)
     
     pygame.display.update()
 
