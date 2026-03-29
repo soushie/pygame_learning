@@ -28,6 +28,8 @@ background = pygame.transform.scale(background, (Screen_Width, Screen_Height))
 #gets sprites for character and animation
 sprite_sheet_image = pygame.image.load("assets/images/doux.png").convert_alpha()
 sprite_sheet = SpriteSheet(sprite_sheet_image)
+eyvaz_mask = pygame.mask.from_surface(sprite_sheet_image)
+mask_image = eyvaz_mask.to_surface()
 
 #door animation
 door_sheet = SpriteSheet(pygame.image.load("assets/images/door.png").convert_alpha())
@@ -35,7 +37,7 @@ door_anim = [door_sheet.get_image(0, 24, 24, 4, Black) ,door_sheet.get_image(1, 
 door_state = 0
 f = 1
 
-#create animation# load background
+#create animation, load background
 background = pygame.image.load("assets/images/background.png").convert()
 background = pygame.transform.scale(background, (Screen_Width, Screen_Height))
 animation_list = []
@@ -50,6 +52,23 @@ step_counter = 0
 player_rect = pygame.Rect(player_pos.x, player_pos.y, 72, 72)
 door_rect = pygame.Rect(800,300, 96, 96)
 
+# boundaries (walls / forbidden zones)
+walls = [
+
+    # TOP WALL (ceiling + boards area)
+    pygame.Rect(0, 0, 1440, 170),
+
+    # LEFT WINDOW WALL
+    pygame.Rect(0, 0, 180, 720),
+
+    # RIGHT WALL
+    pygame.Rect(1310, 0, 180, 720),
+
+    # BOTTOM LIMIT
+    pygame.Rect(0, 650, 1440, 70),
+
+]
+
 
 for animation in animation_steps:
     temp_img_list = []
@@ -58,16 +77,15 @@ for animation in animation_steps:
         step_counter += 1
     animation_list.append(temp_img_list)
 
-
-#gameloop
-running = True
-
 def set_action(new_action):
     global action, frame, last_update
     if new_action != action:
         action = new_action
         frame = 0
         last_update = pygame.time.get_ticks()
+
+#gameloop
+running = True
 
 while running:
 
@@ -124,11 +142,25 @@ while running:
     future_rect = player_rect.move(dx, dy)
 
     # collision check
-    if not future_rect.colliderect(door_rect):
+    collision = False
+
+    #check walls
+    for wall in walls:
+        if future_rect.colliderect(wall):
+            collision = True
+            break
+
+    #check door
+    if future_rect.colliderect(door_rect):
+        collision = True
+
+    #move only if no collision
+    if not collision:
         player_pos.x += dx
         player_pos.y += dy
+
+    #update rect position
     player_rect.topleft = (int(player_pos.x), int(player_pos.y))
-    player_rect.topleft = player_pos
 
     #update animation
     current_time = pygame.time.get_ticks()
