@@ -138,26 +138,46 @@ while running:
         if frame >= animation_steps[action]:
             frame = 0
     
-    # future position
-    future_rect = player_rect.move(dx, dy)
+    # ---------- MOVE X ----------
+    player_pos.x += dx
+    player_rect.topleft = (int(player_pos.x), int(player_pos.y))
 
-    # collision check
-    collision = False
-
-    #check walls
     for wall in walls:
-        if future_rect.colliderect(wall):
-            collision = True
-            break
+        if player_rect.colliderect(wall):
+            if dx > 0:  # moving right
+                player_rect.right = wall.left
+            if dx < 0:  # moving left
+                player_rect.left = wall.right
+            player_pos.x = player_rect.x
 
-    #check door
-    if future_rect.colliderect(door_rect):
-        collision = True
+    # door collision (X)
+    if player_rect.colliderect(door_rect):
+        if dx > 0:
+            player_rect.right = door_rect.left
+        if dx < 0:
+            player_rect.left = door_rect.right
+        player_pos.x = player_rect.x
 
-    #move only if no collision
-    if not collision:
-        player_pos.x += dx
-        player_pos.y += dy
+
+    # ---------- MOVE Y ----------
+    player_pos.y += dy
+    player_rect.topleft = (int(player_pos.x), int(player_pos.y))
+
+    for wall in walls:
+        if player_rect.colliderect(wall):
+            if dy > 0:  # moving down
+                player_rect.bottom = wall.top
+            if dy < 0:  # moving up
+                player_rect.top = wall.bottom
+            player_pos.y = player_rect.y
+
+    # door collision (Y)
+    if player_rect.colliderect(door_rect):
+        if dy > 0:
+            player_rect.bottom = door_rect.top
+        if dy < 0:
+            player_rect.top = door_rect.bottom
+        player_pos.y = player_rect.y
 
     #update rect position
     player_rect.topleft = (int(player_pos.x), int(player_pos.y))
