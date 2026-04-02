@@ -1,5 +1,6 @@
 import pygame
-from classes import SpriteSheet
+from classes.classes import SpriteSheet
+from classes.gameobject import GameObject
 
 pygame.init()
 
@@ -33,6 +34,25 @@ sprite_sheet = SpriteSheet(sprite_sheet_image)
 door_sheet = SpriteSheet(pygame.image.load("assets/images/door.png").convert_alpha())
 door_anim = [door_sheet.get_image(0, 24, 24, 4, Black) ,door_sheet.get_image(1, 24, 24, 4, Black) ]
 
+#gets the assets for the room
+desk_books_sheet = pygame.image.load("assets/images/desk_books.png").convert_alpha()
+desk_laptop_sheet = pygame.image.load("assets/images/desk_laptop.png").convert_alpha()
+desk_mpt_sheet = pygame.image.load("assets/images/desk_mpt.png").convert_alpha()
+desk_mptback_sheet = pygame.image.load("assets/images/desk_mptback.png").convert_alpha()
+desk_notebook_sheet = pygame.image.load("assets/images/desk_notebook.png").convert_alpha()
+desk_notenbook_sheet = pygame.image.load("assets/images/desk_notenbook.png").convert_alpha()
+desk_tablet_sheet = pygame.image.load("assets/images/desk_tablet.png").convert_alpha()
+
+objects = []
+
+objects.append(GameObject(desk_books_sheet, 300, 300))
+objects.append(GameObject(desk_laptop_sheet, 600, 300))
+objects.append(GameObject(desk_mpt_sheet, 700, 300))
+objects.append(GameObject(desk_mptback_sheet, 800, 300))
+objects.append(GameObject(desk_notebook_sheet, 800, 600))
+objects.append(GameObject(desk_notenbook_sheet, 800, 600))
+objects.append(GameObject(desk_tablet_sheet, 800, 600))
+
 door_state = 0
 f = 1
 
@@ -50,22 +70,24 @@ step_counter = 0
 #collision
 player_rect = pygame.Rect(player_pos.x, player_pos.y, 72, 72)
 door_rect = pygame.Rect(800,300, 96, 96)
+desk_mptback_sheet_rect = pygame.Rect(800,300, 24, 4)
+desk_laptop_sheet_rect = pygame.Rect(800,300, 24, 4)
+desk_books_sheet_rect = pygame.Rect(800,300, 24, 4)
+desk_notebook_sheet_rect = pygame.Rect(800,300, 24, 4)
+desk_mpt_sheet_rect = pygame.Rect(800,300, 24, 4)
+desk_notenbook_sheet_rect = pygame.Rect(800,300, 24, 4)
+desk_tablet_sheet_rect = pygame.Rect(800,300, 24, 4)
 
 # boundaries (walls / forbidden zones)
 walls = [
-
     # TOP WALL (ceiling + boards area)
     pygame.Rect(0, 0, 1440, 170),
-
     # LEFT WINDOW WALL
     pygame.Rect(0, 0, 180, 720),
-
     # RIGHT WALL
     pygame.Rect(1310, 0, 180, 720),
-
     # BOTTOM LIMIT
-    pygame.Rect(0, 650, 1440, 70),
-
+    pygame.Rect(0, 650, 1440, 10),
 ]
 
 
@@ -136,6 +158,9 @@ while running:
         if frame >= animation_steps[action]:
             frame = 0
 
+    for obj in objects:
+        obj.draw(screen)
+
     # PLAYER + DOOR MASKS
     player_image = animation_list[action][frame]
     player_mask = pygame.mask.from_surface(player_image)
@@ -195,6 +220,34 @@ while running:
 
     # FINAL SYNC
     player_pos.xy = player_rect.topleft
+
+    #objects move x
+    for obj in objects:
+
+        offset = (
+            obj.rect.x - player_rect.x,
+            obj.rect.y - player_rect.y
+        )
+
+        if player_mask.overlap(obj.mask, offset):
+            if dx > 0:
+                player_rect.right = obj.rect.left
+            if dx < 0:
+                player_rect.left = obj.rect.right
+
+    #objects move y
+    for obj in objects:
+
+        offset = (
+            obj.rect.x - player_rect.x,
+            obj.rect.y - player_rect.y
+        )
+
+        if player_mask.overlap(obj.mask, offset):
+            if dy > 0:
+                player_rect.bottom = obj.rect.top
+            if dy < 0:
+                player_rect.top = obj.rect.bottom
 
     #update animation
     current_time = pygame.time.get_ticks()
