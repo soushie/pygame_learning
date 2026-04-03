@@ -1,5 +1,5 @@
 import pygame
-from classes.classes import SpriteSheet
+from classes.sprites import SpriteSheet
 from classes.gameobject import GameObject
 
 pygame.init()
