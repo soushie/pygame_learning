@@ -142,10 +142,18 @@ while running:
     if keys[pygame.K_w]:
         dy = -speed * dt
         moving = True
+        if action == 0 :
+            set_action(1)
+        if action == 2:
+            set_action(3)
 
     if keys[pygame.K_s]:
         dy = speed * dt
         moving = True
+        if action == 0 :
+            set_action(1)
+        if action == 2:
+            set_action(3)
 
     if moving == False :
         if action == 1 :
