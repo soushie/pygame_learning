@@ -30,9 +30,6 @@ background = pygame.transform.scale(background, (Screen_Width, Screen_Height))
 sprite_sheet_image = pygame.image.load("assets/images/doux.png").convert_alpha()
 sprite_sheet = SpriteSheet(sprite_sheet_image)
 
-#door animation
-door_sheet = SpriteSheet(pygame.image.load("assets/images/door.png").convert_alpha())
-door_anim = [door_sheet.get_image(0, 24, 24, 4, Black) ,door_sheet.get_image(1, 24, 24, 4, Black) ]
 
 #gets the assets for the room
 desk_books_sheet = pygame.image.load("assets/images/desk_books.png").convert_alpha()
@@ -165,8 +162,6 @@ while running:
     player_image = animation_list[action][frame]
     player_mask = pygame.mask.from_surface(player_image)
 
-    door_image = door_anim[door_state]
-    door_mask = pygame.mask.from_surface(door_image)
 
     # MOVE X (predictive)
     future_rect = player_rect.copy()
@@ -179,15 +174,6 @@ while running:
         if future_rect.colliderect(wall):
             blocked = True
             break
-
-    # door mask collision
-    if not blocked:
-        offset = (
-            door_rect.x - future_rect.x,
-            door_rect.y - future_rect.y
-        )
-        if player_mask.overlap(door_mask, offset):
-            blocked = True
 
     # apply movement only if free
     if not blocked:
@@ -204,15 +190,6 @@ while running:
         if future_rect.colliderect(wall):
             blocked = True
             break
-
-    # door mask collision
-    if not blocked:
-        offset = (
-            door_rect.x - future_rect.x,
-            door_rect.y - future_rect.y
-        )
-        if player_mask.overlap(door_mask, offset):
-            blocked = True
 
     # apply movement only if free
     if not blocked:
@@ -258,7 +235,6 @@ while running:
         if frame >= animation_steps[action]:
             frame = 0
 
-    screen.blit(door_image, door_rect.topleft)
     screen.blit(player_image, player_rect.topleft)
     
     pygame.display.update()
