@@ -67,6 +67,7 @@ step_counter = 0
 #collision
 player_rect = pygame.Rect(player_pos.x, player_pos.y, 72, 72)
 door_rect = pygame.Rect(800,300, 96, 96)
+'''
 desk_mptback_sheet_rect = pygame.Rect(800,300, 24, 4)
 desk_laptop_sheet_rect = pygame.Rect(800,300, 24, 4)
 desk_books_sheet_rect = pygame.Rect(800,300, 24, 4)
@@ -74,6 +75,7 @@ desk_notebook_sheet_rect = pygame.Rect(800,300, 24, 4)
 desk_mpt_sheet_rect = pygame.Rect(800,300, 24, 4)
 desk_notenbook_sheet_rect = pygame.Rect(800,300, 24, 4)
 desk_tablet_sheet_rect = pygame.Rect(800,300, 24, 4)
+'''
 
 # boundaries (walls / forbidden zones)
 walls = [
@@ -171,68 +173,60 @@ while running:
     player_mask = pygame.mask.from_surface(player_image)
 
 
-    # MOVE X (predictive)
+    # ---------- MOVE X ----------
     future_rect = player_rect.copy()
     future_rect.x += int(dx)
 
     blocked = False
 
-    # wall collision
+    # walls
     for wall in walls:
         if future_rect.colliderect(wall):
             blocked = True
             break
 
-    # apply movement only if free
+    # objects
+    if not blocked:
+        for obj in objects:
+            offset = (
+                obj.rect.x - future_rect.x,
+                obj.rect.y - future_rect.y
+            )
+            if player_mask.overlap(obj.mask, offset):
+                blocked = True
+                break
+
     if not blocked:
         player_rect.x = future_rect.x
 
-    # MOVE Y (predictive)
+    # ---------- MOVE Y ----------
     future_rect = player_rect.copy()
     future_rect.y += int(dy)
 
     blocked = False
 
-    # wall collision
+    # walls
     for wall in walls:
         if future_rect.colliderect(wall):
             blocked = True
             break
 
-    # apply movement only if free
+    # objects
+    if not blocked:
+        for obj in objects:
+            offset = (
+                obj.rect.x - future_rect.x,
+                obj.rect.y - future_rect.y
+            )
+            if player_mask.overlap(obj.mask, offset):
+                blocked = True
+                break
+
     if not blocked:
         player_rect.y = future_rect.y
 
     # FINAL SYNC
     player_pos.xy = player_rect.topleft
-
-    #objects move x
-    for obj in objects:
-
-        offset = (
-            obj.rect.x - player_rect.x,
-            obj.rect.y - player_rect.y
-        )
-
-        if player_mask.overlap(obj.mask, offset):
-            if dx > 0:
-                player_rect.right = obj.rect.left
-            if dx < 0:
-                player_rect.left = obj.rect.right
-
-    #objects move y
-    for obj in objects:
-
-        offset = (
-            obj.rect.x - player_rect.x,
-            obj.rect.y - player_rect.y
-        )
-
-        if player_mask.overlap(obj.mask, offset):
-            if dy > 0:
-                player_rect.bottom = obj.rect.top
-            if dy < 0:
-                player_rect.top = obj.rect.bottom
 
     #update animation
     current_time = pygame.time.get_ticks()
