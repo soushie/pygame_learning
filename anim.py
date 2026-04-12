@@ -42,13 +42,13 @@ desk_tablet_sheet = pygame.image.load("assets/images/desk_tablet.png").convert_a
 
 objects = []
 
-objects.append(GameObject(desk_books_sheet, 300, 300))
-objects.append(GameObject(desk_laptop_sheet, 600, 300))
-objects.append(GameObject(desk_mpt_sheet, 700, 300))
-objects.append(GameObject(desk_mptback_sheet, 800, 300))
-objects.append(GameObject(desk_notebook_sheet, 800, 600))
-objects.append(GameObject(desk_notenbook_sheet, 800, 600))
-objects.append(GameObject(desk_tablet_sheet, 800, 600))
+objects.append(GameObject(desk_books_sheet, 645, 225))
+objects.append(GameObject(desk_laptop_sheet, 645, 390))
+objects.append(GameObject(desk_mptback_sheet, 645, 565))
+objects.append(GameObject(desk_mptback_sheet, 945, 400))
+objects.append(GameObject(desk_notebook_sheet, 945, 560))
+objects.append(GameObject(desk_notenbook_sheet, 345, 400))
+objects.append(GameObject(desk_tablet_sheet, 345, 560))
 
 door_state = 0
 f = 1
