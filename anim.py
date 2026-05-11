@@ -1,4 +1,5 @@
 import pygame
+import sys
 from classes.sprites import SpriteSheet
 from classes.gameobject import GameObject
 
@@ -22,23 +23,25 @@ dt=0
 screen= pygame.display.set_mode((Screen_Width , Screen_Height))
 pygame.display.set_caption("dinosawr")
 # load background
-background = pygame.image.load("assets/images/background.png").convert()
-background = pygame.transform.scale(background, (Screen_Width, Screen_Height))
-
+background_closed = pygame.image.load(r"pygame_learning-eyvazawayout\assets\images\background.png").convert()
+background_closed = pygame.transform.scale(background_closed, (Screen_Width, Screen_Height))
+background_open = pygame.image.load(r"pygame_learning-eyvazawayout\assets\images\background_door_open.png").convert()
+background_open = pygame.transform.scale(background_open, (Screen_Width, Screen_Height))
+background = background_closed
 
 #gets sprites for character and animation
-sprite_sheet_image = pygame.image.load("assets/images/doux.png").convert_alpha()
+sprite_sheet_image = pygame.image.load("pygame_learning-eyvazawayout/assets/images/doux.png").convert_alpha()
 sprite_sheet = SpriteSheet(sprite_sheet_image)
 
 
 #gets the assets for the room
-desk_books_sheet = pygame.image.load("assets/images/desk_books.png").convert_alpha()
-desk_laptop_sheet = pygame.image.load("assets/images/desk_laptop.png").convert_alpha()
-desk_mpt_sheet = pygame.image.load("assets/images/desk_mpt.png").convert_alpha()
-desk_mptback_sheet = pygame.image.load("assets/images/desk_mptback.png").convert_alpha()
-desk_notebook_sheet = pygame.image.load("assets/images/desk_notebook.png").convert_alpha()
-desk_notenbook_sheet = pygame.image.load("assets/images/desk_notenbook.png").convert_alpha()
-desk_tablet_sheet = pygame.image.load("assets/images/desk_tablet.png").convert_alpha()
+desk_books_sheet = pygame.image.load("pygame_learning-eyvazawayout/assets/images/desk_books.png").convert_alpha()
+desk_laptop_sheet = pygame.image.load("pygame_learning-eyvazawayout/assets/images/desk_laptop.png").convert_alpha()
+desk_mpt_sheet = pygame.image.load("pygame_learning-eyvazawayout/assets/images/desk_mpt.png").convert_alpha()
+desk_mptback_sheet = pygame.image.load("pygame_learning-eyvazawayout/assets/images/desk_mptback.png").convert_alpha()
+desk_notebook_sheet = pygame.image.load("pygame_learning-eyvazawayout/assets/images/desk_notebook.png").convert_alpha()
+desk_notenbook_sheet = pygame.image.load("pygame_learning-eyvazawayout/assets/images/desk_notenbook.png").convert_alpha()
+desk_tablet_sheet = pygame.image.load("pygame_learning-eyvazawayout/assets/images/desk_tablet.png").convert_alpha()
 
 objects = []
 
@@ -53,9 +56,7 @@ objects.append(GameObject(desk_tablet_sheet, 345, 560))
 door_state = 0
 f = 1
 
-#create animation, load background
-background = pygame.image.load("assets/images/background.png").convert()
-background = pygame.transform.scale(background, (Screen_Width, Screen_Height))
+#create animation
 animation_list = []
 animation_steps = [4, 6, 4, 6] #animations places in sheet such as running, jumping etc.
 action = 0 #what is player doing (stayin, jumping, etc.)
@@ -89,7 +90,7 @@ walls = [
     pygame.Rect(0, 650, 1440, 10),
 ]
 
-
+#creates a matrix with anim sprites for each action
 for animation in animation_steps:
     temp_img_list = []
     for _ in range(animation):
@@ -104,13 +105,79 @@ def set_action(new_action):
         frame = 0
         last_update = pygame.time.get_ticks()
 
+
+#parolscreen gameloop
+def parol_screen():
+    global screen
+    background_color = (30, 30, 30)
+
+    text_color = (255, 255, 255)
+    font = pygame.font.SysFont("Arial", 30)
+    text = font.render("Write the code, hack the door, and may the freedom be yours...", True, text_color)
+    
+    #lines  
+    lines = [""]
+    current_line = 0
+
+    running = True
+    while running:
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                #close the screen
+                if event.key == pygame.K_ESCAPE:
+                    running = False
+
+                # ENTER
+                if event.key == pygame.K_RETURN:
+                    lines.append("")
+                    current_line += 1
+
+                # BACKSPACE
+                elif event.key == pygame.K_BACKSPACE:
+
+                    # Əgər sətirdə hərf varsa
+                    if len(lines[current_line]) > 0:
+                        lines[current_line] = lines[current_line][:-1]
+
+                    # Əgər sətir boşdursa əvvəlki sətrə qayıt
+                    elif current_line > 0:
+
+                        lines[current_line - 1] += lines[current_line]
+
+                        lines.pop(current_line)
+
+                        current_line -= 1
+
+                else:
+                    lines[current_line] += event.unicode
+        
+        screen.fill(background_color) 
+        screen.blit(text, (20, 20))
+
+        # Bütün sətirləri çək
+        for i, line in enumerate(lines):
+
+            text_surface = font.render(line, True, text_color)
+            screen.blit(text_surface, (20, 80 + i * 30))
+
+
+        pygame.display.update()
+        
+
 #gameloop
 running = True
 
 while running:
 
     dt = clock.tick(60)/1000
-
+    if door_state == 0:
+        background = background_closed
+    else:
+        background = background_open
     screen.blit(background, (0,0))
 
     for event in pygame.event.get():
@@ -118,9 +185,11 @@ while running:
             running = False
 
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_e:
+            if event.key == pygame.K_e and player_pos.x >= 1200 and player_pos.y >= 300 and player_pos.y <= 420:
                 door_state += f
                 f = -f
+            if event.key == pygame.K_f:
+                parol_screen()
 
     moving = False
 
@@ -157,7 +226,7 @@ while running:
         if action == 2:
             set_action(3)
 
-    if moving == False :
+    if not moving:
         if action == 1 :
             set_action(0)
         if action == 3:
