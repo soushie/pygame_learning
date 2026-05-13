@@ -23,9 +23,9 @@ dt=0
 screen= pygame.display.set_mode((Screen_Width , Screen_Height))
 pygame.display.set_caption("dinosawr")
 # load background
-background_closed = pygame.image.load(r"pygame_learning-eyvazawayout\assets\images\background.png").convert()
+background_closed = pygame.image.load("pygame_learning-eyvazawayout/assets/images/background.png").convert()
 background_closed = pygame.transform.scale(background_closed, (Screen_Width, Screen_Height))
-background_open = pygame.image.load(r"pygame_learning-eyvazawayout\assets\images\background_door_open.png").convert()
+background_open = pygame.image.load("pygame_learning-eyvazawayout/assets/images/background_door_open.png").convert()
 background_open = pygame.transform.scale(background_open, (Screen_Width, Screen_Height))
 desk_laptop_upclose = pygame.image.load("pygame_learning-eyvazawayout/assets/images/desk_laptop_upclose.jpg").convert_alpha()
 desk_laptop_upclose = pygame.transform.scale(desk_laptop_upclose, (Screen_Width, Screen_Height))
@@ -128,6 +128,7 @@ def parol_screen():
     # Dogru sifre
     correct_password = "3112"
 
+    is_incorrect = False
 
 
     running = True
@@ -146,7 +147,7 @@ def parol_screen():
                     running = False
 
             
-            if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.type == pygame.MOUSEBUTTONDOWN and door_locked:
                 mouse_pos = pygame.Vector2(pygame.mouse.get_pos())
 
                 if len(entered_password)<4 and mouse_pos.x >= 666 and mouse_pos.x <= 704 and mouse_pos.y >= 355 and mouse_pos.y <= 390:
@@ -190,15 +191,23 @@ def parol_screen():
                         entered_password = ""
                         text_color = (255,0,0)
                         text_start_time = current_time
+                        is_incorrect = True
 
                     text_pos = (670,302)
                         
         
-        if printed_password == "INCORRECT":
+        if is_incorrect:
             if current_time - text_start_time > 1000:
                 printed_password = ""
                 text_color = (0,0,0)
                 text_pos = (700, 302)
+                is_incorrect = False
+            elif len(entered_password) > 0:
+                printed_password = entered_password + " "
+                text_color = (0,0,0)
+                text_pos = (700, 302)
+                is_incorrect = False
+            
 
         rendered_text = font.render(printed_password, True, text_color)
         screen.blit(rendered_text, text_pos)

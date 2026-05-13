@@ -23,25 +23,25 @@ dt=0
 screen= pygame.display.set_mode((Screen_Width , Screen_Height))
 pygame.display.set_caption("dinosawr")
 # load background
-background_closed = pygame.image.load(r"pygame_learning-eyvazawayout\assets\images\background.png").convert()
+background_closed = pygame.image.load("assets/images/background.png").convert()
 background_closed = pygame.transform.scale(background_closed, (Screen_Width, Screen_Height))
-background_open = pygame.image.load(r"pygame_learning-eyvazawayout\assets\images\background_door_open.png").convert()
+background_open = pygame.image.load("assets/images/background_door_open.png").convert()
 background_open = pygame.transform.scale(background_open, (Screen_Width, Screen_Height))
 background = background_closed
 
 #gets sprites for character and animation
-sprite_sheet_image = pygame.image.load("pygame_learning-eyvazawayout/assets/images/doux.png").convert_alpha()
+sprite_sheet_image = pygame.image.load("assets/images/doux.png").convert_alpha()
 sprite_sheet = SpriteSheet(sprite_sheet_image)
 
 
 #gets the assets for the room
-desk_books_sheet = pygame.image.load("pygame_learning-eyvazawayout/assets/images/desk_books.png").convert_alpha()
-desk_laptop_sheet = pygame.image.load("pygame_learning-eyvazawayout/assets/images/desk_laptop.png").convert_alpha()
-desk_mpt_sheet = pygame.image.load("pygame_learning-eyvazawayout/assets/images/desk_mpt.png").convert_alpha()
-desk_mptback_sheet = pygame.image.load("pygame_learning-eyvazawayout/assets/images/desk_mptback.png").convert_alpha()
-desk_notebook_sheet = pygame.image.load("pygame_learning-eyvazawayout/assets/images/desk_notebook.png").convert_alpha()
-desk_notenbook_sheet = pygame.image.load("pygame_learning-eyvazawayout/assets/images/desk_notenbook.png").convert_alpha()
-desk_tablet_sheet = pygame.image.load("pygame_learning-eyvazawayout/assets/images/desk_tablet.png").convert_alpha()
+desk_books_sheet = pygame.image.load("assets/images/desk_books.png").convert_alpha()
+desk_laptop_sheet = pygame.image.load("assets/images/desk_laptop.png").convert_alpha()
+desk_mpt_sheet = pygame.image.load("assets/images/desk_mpt.png").convert_alpha()
+desk_mptback_sheet = pygame.image.load("assets/images/desk_mptback.png").convert_alpha()
+desk_notebook_sheet = pygame.image.load("assets/images/desk_notebook.png").convert_alpha()
+desk_notenbook_sheet = pygame.image.load("assets/images/desk_notenbook.png").convert_alpha()
+desk_tablet_sheet = pygame.image.load("assets/images/desk_tablet.png").convert_alpha()
 
 objects = []
 
